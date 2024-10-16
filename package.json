@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "nodemailer": "^6.9.15",
+    "y-protocols": "^1.0.6",
+    "y-websocket": "^2.0.4"
+  }
+}

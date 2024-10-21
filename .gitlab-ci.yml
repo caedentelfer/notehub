@@ -1,0 +1,56 @@
+image: node:18  # Use Node.js 18 for both frontend and backend
+
+stages:
+  - Build
+  - Frontend_test
+  - Backend_test
+
+# Step 1: Build the frontend
+build_frontend:
+  stage: Build
+  tags:
+    - shared-docker-runner
+  script:
+    - cd frontend
+    - npm install
+  artifacts:
+    paths:
+      - frontend/.next  # Keep the built frontend files for deployment
+    exclude:
+      - frontend/.next/cache  # Exclude caches
+      - frontend/.next/static/development  # Exclude development-related files
+      - frontend/.next/**/*.map  # Exclude source map files (optional)
+    expire_in: 1 week
+
+# Step 2: Test frontend
+test_frontend:
+  stage: Frontend_test
+  tags:
+    - shared-docker-runner
+  script:
+    - cd frontend # Install frontend dependencies
+    - npm install
+    # - npm run test  # Uncomment this line to run frontend tests (add your test command here)
+  artifacts:
+    when: always
+    paths:
+      - frontend/test-results  # Store test results
+    expire_in: 1 week
+
+# Step 3: Test backend
+test_backend:
+  stage: Backend_test
+  tags:
+    - shared-docker-runner
+  script:
+    - cd backend
+    - npm install  # Install backend dependencies
+    - npm run test  # Run backend tests
+  variables:
+    SUPABASE_URL: $SUPABASE_URL
+    SUPABASE_KEY: $SUPABASE_KEY
+  artifacts:
+    when: always
+    paths:
+      - backend/test-results  # Store test results
+    expire_in: 1 week

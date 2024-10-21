@@ -32,30 +32,19 @@ export default function Hero() {
                                 </p>
                                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                                     {user ? (
-                                        <>  
-                                            <Tooltip message = "View created and shared notes">
+                                        <>
+                                            <Tooltip message="View created and shared notes">
                                                 <div className="rounded-md shadow">
-                                                    
+
                                                     <Link
                                                         href="/pages/notes"
                                                         className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 md:py-4 md:text-lg md:px-10 transition duration-150 ease-in-out"
                                                     >
                                                         <Notebook className="mr-2 h-5 w-5" />
                                                         My Notes
-                                                    </Link> 
+                                                    </Link>
                                                 </div>
                                             </Tooltip>
-                                            <div className="mt-3 sm:mt-0 sm:ml-3">
-                                                <button
-                                                    onClick={() => {
-                                                        console.log('Open new note dialog')
-                                                    }}
-                                                    className="w-full flex items-center justify-center px-8 py-3 border border-purple-600 text-base font-medium rounded-md text-purple-600 bg-white hover:bg-purple-50 md:py-4 md:text-lg md:px-10 transition duration-150 ease-in-out"
-                                                >
-                                                    <PlusCircle className="mr-2 h-5 w-5" />
-                                                    New Note
-                                                </button>
-                                            </div>
                                         </>
                                     ) : (
                                         <>

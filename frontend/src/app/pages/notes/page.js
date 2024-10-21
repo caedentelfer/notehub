@@ -32,8 +32,9 @@ export default function NotesPage() {
     dateCreatedTo: '',
     dateEditedFrom: '',
     dateEditedTo: '',
-    sortBy: 'createdDesc'
-  })
+    sortBy: 'editedDesc'
+  });
+
   const [newNoteError, setNewNoteError] = useState('')
   const [previewedNote, setPreviewedNote] = useState(null)
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
@@ -265,9 +266,10 @@ export default function NotesPage() {
       dateCreatedTo: '',
       dateEditedFrom: '',
       dateEditedTo: '',
-      sortBy: 'createdDesc'
-    })
-  }
+      sortBy: 'editedDesc'
+    });
+  };
+
 
   const formatDate = (date) => {
     if (!date) return 'Not available'
@@ -399,7 +401,7 @@ export default function NotesPage() {
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0">
           <div className="flex items-center space-x-4 w-full md:w-auto">
             <div className="relative flex-grow md:flex-grow-0">
-            <Tooltip message = "Search for notes by title, content, or tags">
+              <Tooltip message="Search for notes by title, content, or tags">
                 <input
                   type="text"
                   placeholder="Search notes..."
@@ -408,10 +410,10 @@ export default function NotesPage() {
                   className="pl-10 pr-4 py-2 w-full md:w-64 border border-gray-300 rounded-md shadow-sm text-gray-900"
                 />
                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            </Tooltip>
+              </Tooltip>
             </div>
             <div className="relative" ref={filterRef}>
-            <Tooltip message = "Apply filters to refine your notes">
+              <Tooltip message="Apply filters to refine your notes">
                 <button
                   onClick={() => setIsFilterOpen(!isFilterOpen)}
                   className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
@@ -419,7 +421,7 @@ export default function NotesPage() {
                   <Filter className="mr-2 h-5 w-5" />
                   Filter
                 </button>
-            </Tooltip>
+              </Tooltip>
               {isFilterOpen && (
                 <div className="absolute left-0 mt-2 w-96 bg-white rounded-lg shadow-xl z-50 overflow-hidden">
                   <div className="p-4 border-b border-gray-200">
@@ -550,7 +552,7 @@ export default function NotesPage() {
                     .map((note) => (
                       <motion.div
                         key={note.note_id}
-                        style={{overflow: 'visible'}}
+                        style={{ overflow: 'visible' }}
                         className={`bg-white shadow-lg rounded-lg overflow-hidden flex flex-col transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl border border-gray-200 relative group`}
                         onClick={() => setSelectedNoteId(note.note_id)}
                       >
@@ -559,7 +561,7 @@ export default function NotesPage() {
                         <div className="p-6 flex-grow">
                           <div className="flex justify-between items-start mb-4">
                             <h2 className="text-2xl font-semibold text-gray-900 leading-tight">{note.title}</h2>
-                            <Tooltip message = "Quick look at note">
+                            <Tooltip message="Quick look at note">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -591,28 +593,28 @@ export default function NotesPage() {
                         </div>
                         <div className="bg-gray-50 px-6 py-4 sm:px-6 flex justify-between items-center border-t border-gray-200">
                           <div className="flex space-x-2">
-                          <Tooltip message = "Edit this current note">
-                            <button
-                              onClick={() => router.push(`/pages/edit?id=${note.note_id}`)}
-                              className="inline-flex items-center px-3 py-1 border border-purple-200 text-sm font-medium rounded-md text-purple-700 bg-purple-50 hover:bg-purple-100 transition duration-150 ease-in-out"
-                            >
-                              <Edit className="mr-1 h-4 w-4" />
-                              Edit
-                            </button>
-                           </Tooltip> 
-                            {userRoles[note.note_id] && (
-                              <Tooltip message = "Delete this note">
+                            <Tooltip message="Edit this current note">
                               <button
-                                onClick={() => handleDeleteNote(note.note_id)}
-                                className="inline-flex items-center px-3 py-1 border border-red-200 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none transition duration-150 ease-in-out"
+                                onClick={() => router.push(`/pages/edit?id=${note.note_id}`)}
+                                className="inline-flex items-center px-3 py-1 border border-purple-200 text-sm font-medium rounded-md text-purple-700 bg-purple-50 hover:bg-purple-100 transition duration-150 ease-in-out"
                               >
-                                <Trash2 className="mr-1 h-4 w-4" />
-                                Delete
+                                <Edit className="mr-1 h-4 w-4" />
+                                Edit
                               </button>
+                            </Tooltip>
+                            {userRoles[note.note_id] && (
+                              <Tooltip message="Delete this note">
+                                <button
+                                  onClick={() => handleDeleteNote(note.note_id)}
+                                  className="inline-flex items-center px-3 py-1 border border-red-200 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none transition duration-150 ease-in-out"
+                                >
+                                  <Trash2 className="mr-1 h-4 w-4" />
+                                  Delete
+                                </button>
                               </Tooltip>
                             )}
                           </div>
-                          <Tooltip message = "Share note with other users">
+                          <Tooltip message="Share note with other users">
                             <button
                               onClick={() => handleShareNote(note)}
                               className="inline-flex items-center px-3 py-1 border border-blue-200 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none transition duration-150 ease-in-out"
@@ -643,7 +645,7 @@ export default function NotesPage() {
               transition={{ duration: 0.3 }}
               className="fixed inset-0 bg-black"
               onClick={() => setPreviewedNote(null)}
-              
+
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -651,7 +653,7 @@ export default function NotesPage() {
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ duration: 0.3, type: "spring", damping: 15 }}
               className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center"
-              
+
             >
               <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl overflow-hidden max-h-[80vh] flex flex-col">
                 <div className="relative flex-grow overflow-y-auto">
@@ -710,7 +712,7 @@ export default function NotesPage() {
                       </button>
                     )}
                   </div>
-                 
+
                   <button
                     onClick={() => {
                       handleShareNote(previewedNote)
@@ -721,7 +723,7 @@ export default function NotesPage() {
                     <Share2 className="mr-1 h-4 w-4" />
                     Share
                   </button>
-                  
+
                 </div>
               </div>
             </motion.div>

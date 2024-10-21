@@ -31,9 +31,6 @@ const Features = () => {
   return (
     <div className="py-20 bg-gradient-to-br from-purple-50 to-pink-50">
       <div className="container mx-auto px-6">
-        <h2 className="text-3xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 transform transition-all duration-500 ease-in-out translate-y-0 opacity-100">
-          Our Features
-        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <div

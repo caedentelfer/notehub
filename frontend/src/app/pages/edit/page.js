@@ -3,7 +3,13 @@
 import React, { useState, useEffect, useRef, useContext, useCallback, Suspense } from 'react'
 import { debounce } from 'lodash'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Save, Eye, ArrowLeft, Clock, Tag, X, Users, Share2, Search, UserCheck, UserMinus, Crown, Loader, ChevronDown, ChevronUp, Bold, Heading, Underline, Image as ImageIcon, Minus, List, Link, Code, Menu, LogOut, Settings, User, Mail, Key, Trash2, FolderOpen, ChevronLeft, ChevronRight, Download, Heading1, Heading2, Heading3, Quote } from 'lucide-react'
+import {
+  Save, Eye, ArrowLeft, Clock, Tag, X, Users, Share2, Search, UserCheck,
+  UserMinus, Crown, Loader, ChevronDown, ChevronUp, Bold, Heading, Underline,
+  Image as ImageIcon, Minus, List, Link, Code, Menu, LogOut, Settings, User,
+  Mail, Key, Trash2, FolderOpen, ChevronLeft, ChevronRight, Download,
+  Heading1, Heading2, Heading3, Quote
+} from 'lucide-react'
 import * as Y from 'yjs'
 import { WebsocketProvider } from 'y-websocket'
 import { CodemirrorBinding } from 'y-codemirror'
@@ -13,7 +19,10 @@ import 'codemirror/mode/markdown/markdown'
 import 'codemirror/addon/display/placeholder'
 import { UserContext } from '../../../context/UserContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { fetchNote, updateNote, fetchCategories, addCategory, fetchUsersWithAccess, shareNote, removeUserAccess, fetchUsers } from '../../../utils/api'
+import {
+  fetchNote, updateNote, fetchCategories, addCategory,
+  fetchUsersWithAccess, shareNote, removeUserAccess, fetchUsers
+} from '../../../utils/api'
 import ReactMarkdown from 'react-markdown'
 import Header from '@/components/Header'
 
@@ -63,14 +72,12 @@ function UserLegend({ userPositions }) {
             <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${expandedUser === clientId ? 'transform rotate-180' : ''}`} />
           </button>
           {expandedUser === clientId && (
-            <div className="p-2 border-t border-gray-200">
-              <div className="flex items-center mb-2">
-                <img src={avatar || '/placeholder-avatar.png'} alt={name} className="h-12 w-12 rounded-full mr-3" />
-                <div>
-                  <p className="font-medium text-gray-900 truncate">{name}</p>
-                  <p className="text-sm text-gray-500 truncate">{email}</p>
-                </div>
+            <div className="p-4 border-t border-gray-200 flex flex-col items-center">
+              <div className="mb-4 text-center">
+                <p className="font-medium text-gray-900">{name}</p>
+                <p className="text-sm text-gray-500">{email}</p>
               </div>
+              <img src={avatar || '/placeholder-avatar.png'} alt={name} className="h-24 w-24 rounded-full" />
             </div>
           )}
         </div>
@@ -78,6 +85,8 @@ function UserLegend({ userPositions }) {
     </div>
   )
 }
+
+
 
 export default function EditContent() {
   const router = useRouter()
@@ -113,7 +122,6 @@ export default function EditContent() {
   const bindingRef = useRef(null)
   const cmEditorRef = useRef(null)
   const settingsRef = useRef(null)
-  const contentSetRef = useRef(false)
 
   const [initialContentLoaded, setInitialContentLoaded] = useState(false)
 
@@ -127,7 +135,6 @@ export default function EditContent() {
     if (ytextRef.current) {
       ytextRef.current.delete(0, ytextRef.current.length)
     }
-    contentSetRef.current = false
     setInitialContentLoaded(false)
   }, [])
 
@@ -170,15 +177,43 @@ export default function EditContent() {
         ydocRef.current = ydoc
         ytextRef.current = ydoc.getText('content')
 
-        const websocketUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'ws://localhost:1234'
+        const websocketUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'wss://your-render-app.onrender.com'
         if (providerRef.current) {
           providerRef.current.disconnect()
         }
         const provider = new WebsocketProvider(websocketUrl, noteId, ydoc)
         providerRef.current = provider
 
+        // Handle connection status
         provider.on('status', (event) => {
           console.log(`WebSocket status: ${event.status}`)
+          if (event.status === 'connected') {
+            console.log('WebSocket connected, setting awareness state')
+            provider.awareness.setLocalStateField('user', {
+              name: user ? user.username : 'Anonymous',
+              color: getRandomColor(),
+              email: user ? user.email : '',
+              avatar: user ? user.user_avatar : '',
+            })
+          }
+        })
+
+        // Handle awareness changes
+        provider.awareness.on('change', () => {
+          console.log('Awareness state changed:', provider.awareness.getStates())
+          const states = provider.awareness.getStates()
+          const newUserPositions = {}
+          states.forEach((state, clientID) => {
+            if (state.user) {
+              newUserPositions[clientID] = {
+                name: state.user.name,
+                color: state.user.color,
+                email: state.user.email,
+                avatar: state.user.avatar,
+              }
+            }
+          })
+          setUserPositions(newUserPositions)
         })
 
         const fetchData = async () => {
@@ -192,14 +227,8 @@ export default function EditContent() {
               setNoteName(noteData.title)
               setTags(noteData.tags || [])
               setSelectedCategory(noteData.category_id.toString())
-
-              // Set the initial content only if it hasn't been set yet
-              if (!contentSetRef.current) {
-                ytextRef.current.delete(0, ytextRef.current.length)
-                ytextRef.current.insert(0, noteData.content)
-                contentSetRef.current = true
-              }
             }
+
 
             setCategories(categoriesData)
           } catch (err) {
@@ -210,6 +239,8 @@ export default function EditContent() {
 
         await fetchData()
 
+        // Initialize CodeMirror
+        // Initialize CodeMirror
         if (!cmEditorRef.current && editorRef.current) {
           cmEditorRef.current = CodeMirror(editorRef.current, {
             mode: 'markdown',
@@ -222,42 +253,15 @@ export default function EditContent() {
           cmEditorRef.current.getWrapperElement().style.fontSize = '16px'
           cmEditorRef.current.getWrapperElement().style.fontFamily = 'Inter, system-ui, sans-serif'
           cmEditorRef.current.getWrapperElement().style.height = '100%'
-
-          // Set initial content only if it hasn't been set yet
-          if (!contentSetRef.current) {
-            cmEditorRef.current.setValue(ytextRef.current.toString())
-            contentSetRef.current = true
-          }
         }
 
+
+        // Set up CodemirrorBinding
         if (cmEditorRef.current) {
           if (bindingRef.current) {
             bindingRef.current.destroy()
           }
           bindingRef.current = new CodemirrorBinding(ytextRef.current, cmEditorRef.current, provider.awareness)
-
-          provider.awareness.setLocalStateField('user', {
-            name: user ? user.username : 'Anonymous',
-            color: getRandomColor(),
-            email: user ? user.email : '',
-            avatar: user ? user.user_avatar : '',
-          })
-
-          provider.awareness.on('change', () => {
-            const states = provider.awareness.getStates()
-            const newUserPositions = {}
-            states.forEach((state, clientID) => {
-              if (state.user) {
-                newUserPositions[clientID] = {
-                  name: state.user.name,
-                  color: state.user.color,
-                  email: state.user.email,
-                  avatar: state.user.avatar,
-                }
-              }
-            })
-            setUserPositions(newUserPositions)
-          })
 
           setInitialContentLoaded(true)
         }
@@ -314,7 +318,7 @@ export default function EditContent() {
         if (autoSaveTimeoutRef.current) {
           clearTimeout(autoSaveTimeoutRef.current)
         }
-        autoSaveTimeoutRef.current = setTimeout(autoSave, 2000) // Auto-save after 2 seconds of inactivity
+        autoSaveTimeoutRef.current = setTimeout(autoSave, 2000)
       }
 
       cmEditorRef.current.on('change', onChange)
@@ -328,9 +332,8 @@ export default function EditContent() {
   }, [autoSave])
 
   useEffect(() => {
-    if (initialContentLoaded && cmEditorRef.current && !contentSetRef.current) {
-      cmEditorRef.current.setValue(ytextRef.current.toString())
-      contentSetRef.current = true
+    if (initialContentLoaded && cmEditorRef.current) {
+      // cmEditorRef.current.setValue(ytextRef.current.toString())
     }
   }, [initialContentLoaded])
 

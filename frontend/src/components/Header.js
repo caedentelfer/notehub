@@ -27,7 +27,6 @@ export default function Header() {
         { name: 'Change Image', href: '/pages/change-image', requiresAuth: true, temporaryPage: true },
         { name: 'Change Password', href: '/pages/reset-password', requiresAuth: true, temporaryPage: true },
         { name: 'Delete Account', href: '/pages/delete-account', requiresAuth: true, temporaryPage: true },
-        { name: 'About us', href: '/pages/aboutUs', requiresAuth: false, temporaryPage: false },
     ]
 
     const handleLogout = () => {
@@ -100,7 +99,7 @@ export default function Header() {
                             )}
                         </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-4">
                         {user ? (
                             <div className="flex items-center space-x-4">

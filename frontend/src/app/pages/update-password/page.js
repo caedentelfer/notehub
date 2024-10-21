@@ -7,11 +7,10 @@ import Footer from "../../../components/Footer";
 import { Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import jwt from "jsonwebtoken";
-import { updatePassword, verifyPassword } from "../../../utils/api";
+import { updatePassword } from "../../../utils/api"; // Removed verifyPassword import
 import { UserContext } from "../../../context/UserContext";
 
 export default function UpdatePassword() {
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -19,23 +18,20 @@ export default function UpdatePassword() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
-  const { user } =
-    useContext(UserContext); /*access all user information from context*/
+  const { user } = useContext(UserContext);
   const router = useRouter();
 
   useEffect(() => {
-    /*extract password resetToken*/
     const resetToken = new URLSearchParams(window.location.search).get("token");
 
     if (resetToken) {
       try {
-        /*verify reset token */
         const decoded = jwt.verify(
           resetToken,
           process.env.NEXT_PUBLIC_JWT_SECRET
         );
         if (typeof decoded !== "string" && "email" in decoded) {
-          setEmail(decoded.email); /*set email for password reset purposes*/
+          setEmail(decoded.email);
         } else {
           setError("Invalid token payload");
         }
@@ -46,7 +42,6 @@ export default function UpdatePassword() {
       setError("No token provided");
     }
 
-    /*retrieve the auth token (for the logged-in user)*/
     const authToken =
       localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!authToken) {
@@ -60,22 +55,14 @@ export default function UpdatePassword() {
       return;
     }
 
-    const isPasswordValid = await verifyPassword(user.user_id, currentPassword);
-    if (!isPasswordValid) {
-      setError("Incorrect current password.");
-      return;
-    }
-
     try {
       await updatePassword(email, newPassword);
-
       setUpdateSuccess(true);
       setError("");
 
-      /*redirect to notes page*/
       setTimeout(() => {
         router.push("/pages/notes");
-      }, 1000); /*authentication error here sometimes*/
+      }, 1000);
     } catch (err) {
       setError(err.message);
     }
@@ -95,27 +82,6 @@ export default function UpdatePassword() {
           </h1>
 
           <div className="bg-white shadow-md rounded-lg p-6 space-y-4 update-password-form">
-            {/*curr password*/}
-            <div className="current-password">
-              <label
-                htmlFor="current-password"
-                className="block text-sm font-medium text-gray-700 mb-1 current-password-label"
-              >
-                Current Password
-              </label>
-              <div className="relative current-password-input">
-                <input
-                  id="current-password"
-                  type={isPasswordVisible ? "text" : "password"}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Enter your current password"
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-black"
-                />
-                <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400 current-password-icon" />
-              </div>
-            </div>
-
             {/*new password*/}
             <div className="new-password">
               <label
@@ -198,3 +164,4 @@ export default function UpdatePassword() {
     </div>
   );
 }
+

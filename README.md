@@ -1,10 +1,10 @@
-# Group 41 - NoteHub: Note sharing webapp
+NoteHub: Note sharing webapp
 
 ## Getting Started
 
 To run locally, the packages need to be installed in /front end and /backend. The server needs to be run in /backend and the react app needs to run from /frontend.
 
-** This is all done automatically in the makefile: **
+**This is all done automatically in the makefile:**
 
 In the project root run:
 
@@ -12,11 +12,7 @@ In the project root run:
 make
 ```
 
-this should sort everything out automatically so its better to ALWAYS run the makefile to run if in doubt
-
-Open [http://localhost:3000
-
-The web pages auto-updates as you edit the file. If you make changes to backend files, you will need to run make again
+Open [http://localhost:3000]
 
 ## A note on testing/continuous integration
 
